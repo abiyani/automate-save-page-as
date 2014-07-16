@@ -1,5 +1,5 @@
-auto-save-page-as
-=================
+automate-save-page-as
+=====================
 
 *A quick hack for when `wget --recursive` doesn't cut it.*
 
