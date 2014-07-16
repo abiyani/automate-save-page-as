@@ -1,7 +1,7 @@
 automate-save-page-as
 =====================
 
-*A quick hack for when `wget --recursive` doesn't cut it.*
+*A quick hack for when `wget` doesn't cut it.*
 
 **tldr; Perform browser's "Save page as" (Ctrl+S) operation from command line without manual intervention**
 
