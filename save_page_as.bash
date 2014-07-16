@@ -5,12 +5,12 @@ set -o pipefail
 
 # Assert existence of xdotool to begin with
 if ! xdotool --help &>/dev/null; then
-    printf "ERROR: 'xdotool' is not present (or not in the PATH). Please visit http://www.semicomplete.com/projects/xdotool/ to download it for your platform." >&2
+    printf "ERROR: 'xdotool' is not present (or not in the PATH). Please visit http://www.semicomplete.com/projects/xdotool/ to download it for your platform.\n" >&2
     exit 1
 fi
 
 load_wait_time=4
-save_wait_time=5
+save_wait_time=8
 scriptname="$(basename "$0")"
 destination=""
 browser="google-chrome"
@@ -22,7 +22,7 @@ function print_usage() {
     printf "URL                             The url of the web page to be saved.\n\n" >&2
     printf "options:\n" >&2
     printf "  -d, --destination             Destination path. If a directory, then file is saved with default name inside the directory, else assumed to be full path of target file.\n" >&2
-    printf "  -b, --browser                 Browser executable to be used (must be one of 'google-chrome' or 'firefox'). Default = '%s'.\n" "${browser}" "${browser}" >&2
+    printf "  -b, --browser                 Browser executable to be used (must be one of 'google-chrome' or 'firefox'). Default = '%s'.\n" "${browser}" >&2
     printf "  -l, --load-wait-time          Number of seconds to wait for the page to be loaded (i.e., seconds to sleep before Ctrl+S is 'pressed'). Default = %s\n" "${load_wait_time}" >&2
     printf "  -s, --save-wait-time          Number of seconds to wait for the page to be saved (i.e., seconds to sleep before Ctrl+F4 is 'pressed'). Default = %s\n" "${save_wait_time}" >&2
     printf "  -h, --help                    Display this help message and exit.\n" >&2
