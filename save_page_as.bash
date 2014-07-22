@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -u
 set -o pipefail
 
 # Assert existence of xdotool to begin with
@@ -12,20 +13,22 @@ fi
 load_wait_time=4
 save_wait_time=8
 scriptname="$(basename "$0")"
-destination=""
+destination="."
 browser="google-chrome"
+suffix=""
 url=""
 
 function print_usage() {
     printf "\n%s: Open the given url in a browser tab/window, perform 'Save As' operation and close the tab/window.\n\n" "${scriptname}" >&2
     printf "USAGE:\n   %s URL [OPTIONS]\n\n" "${scriptname}" >&2
-    printf "URL                             The url of the web page to be saved.\n\n" >&2
+    printf "URL                      The url of the web page to be saved.\n\n" >&2
     printf "options:\n" >&2
-    printf "  -d, --destination             Destination path. If a directory, then file is saved with default name inside the directory, else assumed to be full path of target file.\n" >&2
-    printf "  -b, --browser                 Browser executable to be used (must be one of 'google-chrome' or 'firefox'). Default = '%s'.\n" "${browser}" >&2
-    printf "  -l, --load-wait-time          Number of seconds to wait for the page to be loaded (i.e., seconds to sleep before Ctrl+S is 'pressed'). Default = %s\n" "${load_wait_time}" >&2
-    printf "  -s, --save-wait-time          Number of seconds to wait for the page to be saved (i.e., seconds to sleep before Ctrl+F4 is 'pressed'). Default = %s\n" "${save_wait_time}" >&2
-    printf "  -h, --help                    Display this help message and exit.\n" >&2
+    printf "  -d, --destination      Destination path. If a directory, then file is saved with default name inside the directory, else assumed to be full path of target file. Default = '%s'\n" "${destination}" >&2
+    printf "  -s, --suffix           An optional suffix string for the target file name (ignored if --destination arg is a full path)\n" >&2
+    printf "  -b, --browser          Browser executable to be used (must be one of 'google-chrome' or 'firefox'). Default = '%s'.\n" "${browser}" >&2
+    printf "  --load-wait-time       Number of seconds to wait for the page to be loaded (i.e., seconds to sleep before Ctrl+S is 'pressed'). Default = %s\n" "${load_wait_time}" >&2
+    printf "  --save-wait-time       Number of seconds to wait for the page to be saved (i.e., seconds to sleep before Ctrl+F4 is 'pressed'). Default = %s\n" "${save_wait_time}" >&2
+    printf "  -h, --help             Display this help message and exit.\n" >&2
 }
 
 while [ "$#" -gt 0 ]
@@ -36,18 +39,23 @@ do
             destination="$1"
             shift
             ;;
+        -s | --suffix)
+            shift;
+            suffix="$1"
+            shift;
+            ;;
         -b | --browser)
             shift;
             browser="$1"
             shift
             ;;
        
-        -l | --load-wait-time)
+        --load-wait-time)
             shift;
             load_wait_time="$1"
             shift
             ;;
-        -s | --save-wait-time)
+        --save-wait-time)
             shift;
             save_wait_time="$1"
             shift
@@ -133,11 +141,20 @@ if [[ ! "${savefile_wid}" =~ ${wid_re}  ]]; then
     exit 1
 fi
 
+if [[ ! -z "${suffix}" ]]; then
+    xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifiers Right
+    extraarg=""
+    if [[ "${suffix::1}}" == "-" ]]; then
+        extraarg = "-"
+    fi
+    xdotool type --delay 10 --clearmodifiers "${extraarg}" "${suffix}"
+fi
+
 # Activate the 'Save File' dialog and type in the appropriate filename (depending on ${destination} value: 1) directory, 2) full path, 3) empty)
 if [[ ! -z "${destination}" ]]; then 
     if [[ -d "${destination}" ]]; then
         # Case 1: --destination was a directory.
-        xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifiers Left
+        xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifiers Home
         xdotool type --delay 10 --clearmodifiers "${destination}/"
     else
         # Case 2: --destination was full path.

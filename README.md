@@ -17,6 +17,10 @@ $ ./save_page_as.bash "www.facebook.com" --destination "/tmp/facebook_home_page.
 $ ./save_page_as.bash "www.example.com" --browser "firefox" --destination "/tmp"
 ```
 ```
+# Save a url with default name, but provide an additional suffix
+$ ./save_page_as.bash "www.example.com" --destination "/tmp" --suffix "-trial_save"
+```
+```
 # List all available command line options.
 $ ./save_page_as.bash --help
 
@@ -25,15 +29,15 @@ save_page_as.bash: Open the given url in a browser tab/window, perform 'Save As'
 USAGE:
    save_page_as.bash URL [OPTIONS]
 
-URL                             The url of the web page to be saved.
+URL                      The url of the web page to be saved.
 
 options:
-  -d, --destination             Destination path. If a directory, then file is saved with default name inside the directory, else assumed to be full path of target file.
-  -b, --browser                 Browser executable to be used (must be one of 'google-chrome' or 'firefox'). Default = 'google-chrome'.
-  -l, --load-wait-time          Number of seconds to wait for the page to be loaded (i.e., seconds to sleep before Ctrl+S is 'pressed'). Default = 4
-  -s, --save-wait-time          Number of seconds to wait for the page to be saved (i.e., seconds to sleep before Ctrl+F4 is 'pressed'). Default = 8
-  -h, --help                    Display this help message and exit.
-
+  -d, --destination      Destination path. If a directory, then file is saved with default name inside the directory, else assumed to be full path of target file. Default = '.'
+  -s, --suffix           An optional suffix string for the target file name (ignored if --destination arg is a full path)
+  -b, --browser          Browser executable to be used (must be one of 'google-chrome' or 'firefox'). Default = 'google-chrome'.
+  --load-wait-time       Number of seconds to wait for the page to be loaded (i.e., seconds to sleep before Ctrl+S is 'pressed'). Default = 4
+  --save-wait-time       Number of seconds to wait for the page to be saved (i.e., seconds to sleep before Ctrl+F4 is 'pressed'). Default = 8
+  -h, --help             Display this help message and exit.
 ```
 
 The script needs `xdotool` installed (http://www.semicomplete.com/projects/xdotool/): `sudo apt-get install xdotool` (for Ubuntu).
