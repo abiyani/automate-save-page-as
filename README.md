@@ -1,4 +1,4 @@
-automate-save-page-as
+ashutomate-save-page-as
 =====================
 
 *A quick hack for when `wget` doesn't cut it.*
@@ -10,24 +10,24 @@ This small bash script *simulates* a sequence of key presses which opens a given
 *Examples:*
 ```
 # Save your FB home page
-$ ./save_page_as.bash "www.facebook.com" --destination "/tmp/facebook_home_page.html"
+$ ./save_page_as "www.facebook.com" --destination "/tmp/facebook_home_page.html"
 ```
 ```
 # Use Firefox to open a web-page and save it in /tmp (the default name for the file (Page title) is used)
-$ ./save_page_as.bash "www.example.com" --browser "firefox" --destination "/tmp"
+$ ./save_page_as "www.example.com" --browser "firefox" --destination "/tmp"
 ```
 ```
 # Save a url with default name, but provide an additional suffix
-$ ./save_page_as.bash "www.example.com" --destination "/tmp" --suffix "-trial_save"
+$ ./save_page_as "www.example.com" --destination "/tmp" --suffix "-trial_save"
 ```
 ```
 # List all available command line options.
-$ ./save_page_as.bash --help
+$ ./save_page_as --help
 
-save_page_as.bash: Open the given url in a browser tab/window, perform 'Save As' operation and close the tab/window.
+save_page_as: Open the given url in a browser tab/window, perform 'Save As' operation and close the tab/window.
 
 USAGE:
-   save_page_as.bash URL [OPTIONS]
+   save_page_as URL [OPTIONS]
 
 URL                      The url of the web page to be saved.
 
