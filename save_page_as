@@ -49,7 +49,7 @@ do
             browser="$1"
             shift
             ;;
-       
+
         --load-wait-time)
             shift;
             load_wait_time="$1"
@@ -96,7 +96,8 @@ function validate_input() {
             exit 1
         fi
     fi
-    
+    destination="$(readlink -f "$destination")"  # Ensure absolute path
+
     if [[ "${browser}" != "google-chrome" && "${browser}" != "firefox" ]]; then
         printf "ERROR: Browser (${browser}) is not supported, must be one of 'google-chrome' or 'firefox'.\n" >&2
         exit 1
@@ -151,7 +152,7 @@ if [[ ! -z "${suffix}" ]]; then
 fi
 
 # Activate the 'Save File' dialog and type in the appropriate filename (depending on ${destination} value: 1) directory, 2) full path, 3) empty)
-if [[ ! -z "${destination}" ]]; then 
+if [[ ! -z "${destination}" ]]; then
     if [[ -d "${destination}" ]]; then
         # Case 1: --destination was a directory.
         xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifiers Home
@@ -164,7 +165,7 @@ if [[ ! -z "${destination}" ]]; then
 fi
 xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifiers Return
 
-printf "\nINFO: Saving web page ...\n" >&2
+printf "INFO: Saving web page ...\n" >&2
 
 # Wait for the file to be completely saved
 sleep ${save_wait_time}
