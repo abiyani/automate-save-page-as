@@ -1,4 +1,4 @@
-ashutomate-save-page-as
+automate-save-page-as
 =====================
 
 *A quick hack for when `wget` doesn't cut it.*
