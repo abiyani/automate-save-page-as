@@ -80,6 +80,17 @@ do
     esac
 done
 
+# Returns 1 if input param contains any non-printable or non-ascii character, else returns 0
+# (Inspiration: http://stackoverflow.com/a/13596664/1857518)
+function has_non_printable_or_non_ascii() {
+    LANG=C
+    if printf "%s" "${1}" | grep '[^ -~]\+' &>/dev/null; then
+        printf 1
+    else
+        printf 0
+    fi
+}
+
 function validate_input() {
     if [[ -z "${url}" ]]; then
         printf "ERROR: URL must be specified." >&2
@@ -99,13 +110,20 @@ function validate_input() {
     destination="$(readlink -f "$destination")"  # Ensure absolute path
 
     if [[ "${browser}" != "google-chrome" && "${browser}" != "firefox" ]]; then
-        printf "ERROR: Browser (${browser}) is not supported, must be one of 'google-chrome' or 'firefox'.\n" >&2
+        printf "ERROR: Browser (%s) is not supported, must be one of 'google-chrome' or 'firefox'.\n" "${browser}" >&2
         exit 1
     fi
 
     local num_regexp='^.[0-9]+$|^[0-9]+$|^[0-9]+.[0-9]+$'  # Matches a valid number (in decimal notation)
     if [[ ! "${load_wait_time}" =~ $num_regexp || ! "${save_wait_time}" =~ $num_regexp ]]; then
         printf "ERROR: --load-wait-time (='%s'), and --save_wait_time(='%s') must be valid numbers.\n" "${load_wait_time}" "${load_wait_time}" >&2
+        exit 1
+    fi
+
+    if [[ $(has_non_printable_or_non_ascii "${destination}") -eq 1 || $(has_non_printable_or_non_ascii "${suffix}") -eq 1 ]]; then
+        printf "ERROR: Either --destination ('%s') or --suffix ('%s') contains a non ascii or non-printable ascii character(s). " "${destination}" "${suffix}" >&2
+        printf "'xdotool' does not mingle well with non-ascii characters (https://code.google.com/p/semicomplete/issues/detail?id=14).\n\n" >&2
+        printf '!!!! Will NOT proceed !!!!\n' >&2
         exit 1
     fi
 }
@@ -146,7 +164,7 @@ if [[ ! -z "${suffix}" ]]; then
     xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifiers Right
     extraarg=""
     if [[ "${suffix::1}}" == "-" ]]; then
-        extraarg = "-"
+        extraarg="-"
     fi
     xdotool type --delay 10 --clearmodifiers "${extraarg}" "${suffix}"
 fi
