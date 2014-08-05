@@ -160,8 +160,38 @@ if [[ ! "${savefile_wid}" =~ ${wid_re}  ]]; then
     exit 1
 fi
 
+# Fix for Issue #1: Explicitly focus on the "name" field (works on both: gnome, and kde)
+xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifier "Alt+n"
+
+# Check if we are using kde
+is_kde=0
+# Don't feel bad if DESKTOP_SESSION env variable is not present
+set +u
+if [[ "${DESKTOP_SESSION}" =~ ^kde-? ]]; then
+    is_kde=1
+fi
+set -u
+
 if [[ ! -z "${suffix}" ]]; then
-    xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifiers Right
+    ###########################
+    # Make sure that we are at correct position before typing the "suffix"
+    #
+    # If the user is using 'kde-plasma', then the full name of the file including the extension is highlighted
+    # in the name field, so simply pressing a Right key and adding suffix leads to incorrect result.
+    # Hence as a special case for 'kde-*' we move back 5 characters Left from the end before adding the suffix.
+    # Now this strategy is certainly not full proof and assumes that file extension is always 4 characters long ('html'),
+    # but this is the only fix I can think for this special case right now. Of course it's easy to tweak the number of
+    # Left key moves you need if you know your file types in advance.
+    if [[ "${is_kde}" -eq 1 ]]; then
+        printf "INFO: Desktop session is found to be '${DESKTOP_SESSION}', hence the full file name will be highlighted. " >&2
+        printf "Assuming extension .html to move back 5 character left before adding suffix (change accordingly if you need to).\n" >&2
+        xdotool windowactivate "${savefile_wid}" key --delay 40 --clearmodifier End Left Left Left Left Left
+    else
+        xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifiers Right
+    fi
+    set -u
+    ###########################
+
     extraarg=""
     if [[ "${suffix::1}}" == "-" ]]; then
         extraarg="-"
@@ -188,7 +218,10 @@ printf "INFO: Saving web page ...\n" >&2
 # Wait for the file to be completely saved
 sleep ${save_wait_time}
 
-# Close the browser tab/window (Ctrl+F4)
-xdotool windowactivate "${browser_wid}" key --clearmodifiers "ctrl+F4"
-
-printf "Done!\n"
+# Close the browser tab/window (Ctrl+w for KDE, Ctrl+F4 otherwise)
+if [[ "${is_kde}" -eq 1 ]]; then
+    xdotool windowactivate "${browser_wid}" key --clearmodifiers "ctrl+w"
+else
+    xdotool windowactivate "${browser_wid}" key --clearmodifiers "ctrl+F4"
+fi
+printf "INFO: Done!\n">&2
