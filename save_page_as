@@ -84,6 +84,14 @@ done
 # (Inspiration: http://stackoverflow.com/a/13596664/1857518)
 function has_non_printable_or_non_ascii() {
     LANG=C
+    set +e
+    printf "\n----------\nDEBUG: In has_non_printable_or_non_ascii('%s')\nGrep output:\n" "${1}" >&2
+    printf "%s" "${1}" | grep '[^ -~]\+' >&2
+    printf "\nGrep output with -o:\n" >&2
+    printf "%s" "${1}" | grep -o '[^ -~]\+' >&2
+    printf "\n----------" >&2
+    set -e
+    printf "%s" "${1}" | grep '[^ -~]\+' &>/dev/null;
     if printf "%s" "${1}" | grep '[^ -~]\+' &>/dev/null; then
         printf 1
     else
@@ -120,11 +128,17 @@ function validate_input() {
         exit 1
     fi
 
-    if [[ $(has_non_printable_or_non_ascii "${destination}") -eq 1 || $(has_non_printable_or_non_ascii "${suffix}") -eq 1 ]]; then
-        printf "ERROR: Either --destination ('%s') or --suffix ('%s') contains a non ascii or non-printable ascii character(s). " "${destination}" "${suffix}" >&2
-        printf "'xdotool' does not mingle well with non-ascii characters (https://code.google.com/p/semicomplete/issues/detail?id=14).\n\n" >&2
-        printf '!!!! Will NOT proceed !!!!\n' >&2
-        exit 1
+    local dest_non_ascii="$(has_non_printable_or_non_ascii "${destination}")"
+    local suffix_non_ascii="$(has_non_printable_or_non_ascii "${suffix}")"
+
+    if [[ "${dest_non_ascii}" -eq 1 || "${suffix_non_ascii}" -eq 1 ]]; then
+        printf "\n----------\nDEBUG INFO\n----------\n - has_non_printable_or_non_ascii('%s') = '%s'\n - has_non_printable_or_non_ascii('%s') = '%s'\n----------" "${destination}" "${dest_non_ascii}" "${suffix}" "${suffix_non_ascii}" >&2
+        printf '\n\n !!!!! Ignoring this error and continuing (things can go wrong - so please keep an eye on it!) !!!!!\n' >&2
+
+        # printf "ERROR: Either --destination ('%s') or --suffix ('%s') contains a non ascii or non-printable ascii character(s). " "${destination}" "${suffix}" >&2
+        # printf "'xdotool' does not mingle well with non-ascii characters (https://code.google.com/p/semicomplete/issues/detail?id=14).\n\n" >&2
+        # printf '!!!! Will NO!!!!\n' >&2
+        # exit 1
     fi
 }
 validate_input
