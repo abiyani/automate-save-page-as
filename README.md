@@ -7,7 +7,7 @@ automate-save-page-as
 
 ![Demo](demo.gif)
 
-This small bash script *simulates* a sequence of key presses which opens a given url in the browser, save the page (Ctrl+S), and close the browser tab/window (Ctrl+F4). Chained together, these operations allow you to use the "Save Page As" (Ctrl+S) programtically (currently you can use either of `google-chrome` or `firefox`, and it's fairly straight forward to add support for your favorite browser).
+This small bash script *simulates* a sequence of key presses which opens a given url in the browser, save the page (Ctrl+S), and close the browser tab/window (Ctrl+F4). Chained together, these operations allow you to use the "Save Page As" (Ctrl+S) programtically (currently you can use either of `google-chrome`, `chromium-browser` or `firefox`, and it's fairly straight forward to add support for your favorite browser).
 
 
 

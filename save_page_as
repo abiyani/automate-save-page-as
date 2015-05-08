@@ -25,7 +25,7 @@ function print_usage() {
     printf "options:\n" >&2
     printf "  -d, --destination      Destination path. If a directory, then file is saved with default name inside the directory, else assumed to be full path of target file. Default = '%s'\n" "${destination}" >&2
     printf "  -s, --suffix           An optional suffix string for the target file name (ignored if --destination arg is a full path)\n" >&2
-    printf "  -b, --browser          Browser executable to be used (must be one of 'google-chrome' or 'firefox'). Default = '%s'.\n" "${browser}" >&2
+    printf "  -b, --browser          Browser executable to be used (must be one of 'google-chrome', 'chromium-browser' or 'firefox'). Default = '%s'.\n" "${browser}" >&2
     printf "  --load-wait-time       Number of seconds to wait for the page to be loaded (i.e., seconds to sleep before Ctrl+S is 'pressed'). Default = %s\n" "${load_wait_time}" >&2
     printf "  --save-wait-time       Number of seconds to wait for the page to be saved (i.e., seconds to sleep before Ctrl+F4 is 'pressed'). Default = %s\n" "${save_wait_time}" >&2
     printf "  -h, --help             Display this help message and exit.\n" >&2
@@ -109,8 +109,8 @@ function validate_input() {
     fi
     destination="$(readlink -f "$destination")"  # Ensure absolute path
 
-    if [[ "${browser}" != "google-chrome" && "${browser}" != "firefox" ]]; then
-        printf "ERROR: Browser (%s) is not supported, must be one of 'google-chrome' or 'firefox'.\n" "${browser}" >&2
+    if [[ "${browser}" != "google-chrome" && "${browser}" != "chromium-browser" && "${browser}" != "firefox" ]]; then
+        printf "ERROR: Browser (%s) is not supported, must be one of 'google-chrome', 'chromium-browser' or 'firefox'.\n" "${browser}" >&2
         exit 1
     fi
 
