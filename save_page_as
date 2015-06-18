@@ -99,7 +99,7 @@ function validate_input() {
     fi
 
     if [[ -d "${destination}" ]]; then
-        printf "INFO: '%s' is a directory, will save file inside it with the default name.\n" "${destination}">&2
+        printf "INFO: The specified destination ('%s') is a directory path, will save file inside it with the default name.\n" "${destination}">&2
     else
         local basedir="$(dirname "${destination}")"
         if [[ ! -d "${basedir}" ]]; then
@@ -111,6 +111,11 @@ function validate_input() {
 
     if [[ "${browser}" != "google-chrome" && "${browser}" != "chromium-browser" && "${browser}" != "firefox" ]]; then
         printf "ERROR: Browser (%s) is not supported, must be one of 'google-chrome', 'chromium-browser' or 'firefox'.\n" "${browser}" >&2
+        exit 1
+    fi
+
+    if ! command -v "${browser}" &>/dev/null; then
+        printf "ERROR: Command '${browser}' not found. Make sure it is installed, and in path.\n" >&2
         exit 1
     fi
 
