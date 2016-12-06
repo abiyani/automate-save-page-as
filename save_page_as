@@ -17,6 +17,8 @@ destination="."
 browser="google-chrome"
 suffix=""
 url=""
+os=""
+is_unity=0
 
 function print_usage() {
     printf "\n%s: Open the given url in a browser tab/window, perform 'Save As' operation and close the tab/window.\n\n" "${scriptname}" >&2
@@ -132,6 +134,18 @@ function validate_input() {
         exit 1
     fi
 }
+
+function get_os_info() {
+    local release=/etc/lsb-release
+    if [ -f $release ]; then
+        os=$(cat $release | grep DISTRIB_ID | cut -d '=' -f2)
+        if [[ "$os" = "Ubuntu" &&  $(echo "$XDG_CURRENT_DESKTOP") = "Unity" ]]; then
+            is_unity=1
+        fi
+    fi
+}
+
+get_os_info
 validate_input
 ##############
 
@@ -165,8 +179,10 @@ if [[ ! "${savefile_wid}" =~ ${wid_re}  ]]; then
     exit 1
 fi
 
-# Fix for Issue #1: Explicitly focus on the "name" field (works on both: gnome, and kde)
-xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifier "Alt+n"
+# Fix for Issue #1: Explicitly focus on the "name" field (works on both: gnome, and kde). Ignore for unity.
+if [ "$is_unity" -eq 0 ]; then
+    xdotool windowactivate "${savefile_wid}" key --delay 20 --clearmodifier "Alt+n"
+fi
 
 # Check if we are using kde
 is_kde=0
@@ -223,8 +239,8 @@ printf "INFO: Saving web page ...\n" >&2
 # Wait for the file to be completely saved
 sleep ${save_wait_time}
 
-# Close the browser tab/window (Ctrl+w for KDE, Ctrl+F4 otherwise)
-if [[ "${is_kde}" -eq 1 ]]; then
+# Close the browser tab/window (Ctrl+w for KDE or unity, Ctrl+F4 otherwise)
+if [[ "${is_kde}" -eq 1 || "${is_unity}" -eq 1 ]]; then
     xdotool windowactivate "${browser_wid}" key --clearmodifiers "ctrl+w"
 else
     xdotool windowactivate "${browser_wid}" key --clearmodifiers "ctrl+F4"
